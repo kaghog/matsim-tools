@@ -114,7 +114,7 @@ public class CutPopulationFromShapefile {
         for (Person person : populationData.getPersons().values()) {
 
             List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(person.getSelectedPlan().getPlanElements());
-            int n = 1;
+            int n = 11;
             for (TripStructureUtils.Trip trip : trips) {
 
 

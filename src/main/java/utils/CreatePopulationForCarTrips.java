@@ -54,7 +54,7 @@ public class CreatePopulationForCarTrips {
         for (Person person : populationData.getPersons().values()) {
 
             List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(person.getSelectedPlan().getPlanElements());
-            int n = 1;
+            int n = 11;
             for (TripStructureUtils.Trip trip : trips) {
 
 
@@ -138,11 +138,13 @@ public class CreatePopulationForCarTrips {
                         newPerson.getAttributes().putAttribute("isCarPassenger", person.getAttributes().getAttribute("isCarPassenger"));
 
                         newPop.addPerson(newPerson);
-                        n++;
+
 
 
                     }
+
                 }
+                n++;
             }
 
         }
