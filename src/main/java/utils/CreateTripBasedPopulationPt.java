@@ -60,6 +60,11 @@ public class CreateTripBasedPopulationPt {
 
                     //remove the route and set the mode
                     for (Leg leg : trip.getLegsOnly()) {
+                    	
+                    	//skip freight transport
+                    	if(leg.getMode().equals("truck")) {
+                    		continue;
+                    	}
 
                         Person newPerson = populationFactory.createPerson(Id.create(person.getId().toString() + n, Person.class));
                         Plan p = populationFactory.createPlan();
