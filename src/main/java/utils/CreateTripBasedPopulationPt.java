@@ -12,6 +12,9 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.households.Household;
+import org.matsim.households.Households;
+import org.matsim.households.HouseholdsReaderV10;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -25,26 +28,40 @@ public class CreateTripBasedPopulationPt {
 
     	CommandLine cmd = (new CommandLine.Builder(args))
                 .requireOptions("input-path", "output-path")
-                .allowOptions("min-distance")
+                .allowOptions("min-distance", "household-path")
                 .build();
 
 		
-		 String population = cmd.getOptionStrict("input-path"); String outputfile =
-		 cmd.getOptionStrict("output-path");
+		 String population = cmd.getOptionStrict("input-path"); 
+		 String outputfile = cmd.getOptionStrict("output-path");
 		 
 		Boolean setMinTripLength = cmd.hasOption("min-distance");
 		double minDistance = setMinTripLength ? Integer.parseInt(cmd.getOption("min-distance").get()) : 0.0;
+		
+		Boolean useHouseholds = cmd.hasOption("household-path");
+		String hhfile = useHouseholds ? cmd.getOption("household-path").get() : null ;
 
 
         Config config = ConfigUtils.createConfig();
         Scenario scenario = ScenarioUtils.createScenario(config);
+        
         PopulationReader popReader = new PopulationReader(scenario);
         popReader.readFile(population);
+        
+        Households hh_tmp = scenario.getHouseholds();
+        HouseholdsReaderV10 hh = new HouseholdsReaderV10(hh_tmp);
+        hh.readFile(hhfile);
 
         ScenarioUtils.loadScenario(scenario);
+        
+        //add specific household attributes to the population (bikeAvailability and Sp_region)
+        if(useHouseholds) {
+        adjustScenario(scenario);}
 
         Population populationData = scenario.getPopulation();
         PopulationFactory populationFactory = populationData.getFactory();
+        
+        
 
         Population newPop = PopulationUtils.createPopulation(scenario.getConfig());
 
@@ -111,4 +128,23 @@ public class CreateTripBasedPopulationPt {
 
 
     }
+    
+    public static void adjustScenario(Scenario scenario) {
+		for (Household household : scenario.getHouseholds().getHouseholds().values()) {
+			for (Id<Person> memberId : household.getMemberIds()) {
+				Person person = scenario.getPopulation().getPersons().get(memberId);
+
+				if (person != null) {
+					copyAttribute(household, person, "bikeAvailability");
+					copyAttribute(household, person, "spRegion");
+				}
+			}
+		}
+	}
+
+	public static void copyAttribute(Household household, Person person, String attribute) {
+		if (household.getAttributes().getAsMap().containsKey(attribute)) {
+			person.getAttributes().putAttribute(attribute, household.getAttributes().getAttribute(attribute));
+		}
+	}
 }
