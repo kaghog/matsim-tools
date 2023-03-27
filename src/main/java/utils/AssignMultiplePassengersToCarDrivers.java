@@ -67,6 +67,7 @@ public class AssignMultiplePassengersToCarDrivers {
         Population populationData = scenario.getPopulation();
 
         List<Id<Person> > passengerList = new ArrayList<>();
+        Map<Id<Person>, Person> matchedPassengers = new HashMap<>();
 
         System.out.println("Initial Pop size: " +populationData.getPersons().size());
 
@@ -88,6 +89,7 @@ public class AssignMultiplePassengersToCarDrivers {
                                     if (ind > 1) {
                                         reservedPassengers = reservedPassengers + "," + id;
                                         passengerList.add(Id.create(id, Person.class));
+
                                     } else {
                                         reservedPassengers = reservedPassengers + id;
                                     }
@@ -101,8 +103,26 @@ public class AssignMultiplePassengersToCarDrivers {
 
                             }
                         }
+                        if (scenarioType.equals("Norm") && (driversPassengers.get(driverId) != null)){
+                            int ind = 1;
+                            for (String id: driversPassengers.get(driverId)){
+                                if (ind > 1) {
+                                    passengerList.add(Id.create(id, Person.class));
 
-                        leg.setMode("drt");
+                                    //ToDo create a person with drivers' information
+                                    Person newPassenger = null;
+                                    person.getPlans();
+
+                                    //matchedPassengers.put(Id.create(id, Person.class),newPassenger);
+
+                                    //ToDo give the person its an attribute of its initial personID?
+
+                                }
+                                ind++;
+                            }
+                        }
+
+                                leg.setMode("drt");
                         leg.getAttributes().removeAttribute("routingMode");
                         leg.getAttributes().putAttribute("routingMode", "drt");
 
@@ -115,11 +135,19 @@ public class AssignMultiplePassengersToCarDrivers {
 
         //delete passengers in Group scenario
         if (scenarioType.equals("Group")) {
+            //get list of persons from dictionary key
             for (Id<Person> id: passengerList){
                 populationData.removePerson(id);
             }
             System.out.println("Pop size with car passengers removed for group scenario: " + passengerList.size());
         }
+
+        //toDo update the matched passengers in Norm scenario to have same origin, destination and departure time as it's driver
+        if (scenarioType.equals("Norm")){
+            //remove passenger with old plan and add passeg again with their corresponding driver information
+        }
+        //store driver's plan along with passenger list
+        //loop through all the passengers and update their plan
 
         System.out.println("Final Pop size: " +populationData.getPersons().size());
 
