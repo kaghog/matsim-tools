@@ -70,7 +70,10 @@ public class ConvertPlansToCSV {
                 for (Leg leg : trip.getLegsOnly()) {
                         preceding_purpose = trip.getOriginActivity().getType();
                         following_purpose = trip.getDestinationActivity().getType();
-                        routing_mode = leg.getAttributes().getAttribute("routingMode").toString();
+                        routing_mode = leg.getAttributes().getAttribute("routingMode") != null ? leg.getAttributes().getAttribute("routingMode").toString() : "";
+                        if (routing_mode.equals("")){
+                            System.out.println("Could not find routing mode for " + leg.getMode());
+                        }
                         if (routing_mode.equals("pt")){
                             if(mode_detailed.equals("")){
                                 mode_detailed = leg.getMode();
